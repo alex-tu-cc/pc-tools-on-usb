@@ -1,1 +1,5 @@
-d41d8cd98f00b204e9800998ecf8427e  ./no_sb
+94f7bcb8c853d739210e7beba3152c1a  ./maas-pkgs/cert-sru-oobe-preseed_1ubuntu3_all.deb
+c1d5698bcb48ff75c152daedf93cf6c5  ./maas-pkgs/oem-workaround-automatic-oem-config-parameter_1.0_all.deb
+a106ecfbab3046811084fc85ff5d4379  ./pc-sanity-scripts/disable-uattu.py
+8f31b3e4589dc45d80f7f0c309e30399  ./scripts/chroot-scripts/os-post/80_pre-autosanity.sh
+f2f0b83001fb0d85e31000e5df888c3b  ./scripts/chroot-scripts/os-post/81_autosanity.sh
