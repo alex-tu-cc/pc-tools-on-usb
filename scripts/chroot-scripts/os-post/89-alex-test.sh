@@ -18,3 +18,7 @@ python3 /$RP/my-scripts/disable-uattu.py
 mkdir -p /etc/ssh/sshd_config.d
 cp /$RP/personal_tmp/pc_sanity.conf /etc/ssh/sshd_config.d/
 cp /$RP/personal_tmp/authorized_keys /etc/ssh/authorized_keys
+
+# let sudoer doing sudo without password.
+mkdir -p /etc/sudoers.d
+cp /$RP/personal_tmp/nopwd /etc/sudoers.d/nopwd
