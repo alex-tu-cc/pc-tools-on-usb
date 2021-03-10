@@ -81,7 +81,7 @@ inject_preseed() {
     echo " == inject_preseed == "
     download_preseed && \
     push_preseed && \
-    scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/cdrom/SUCCSS_push_preseed /tmp || usage
+    scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/cdrom/SUCCSS_push_preseed $temp_folder || usage
     $SSH "$user_on_target"@"$target_ip" touch /tmp/SUCCSS_inject_preseed
 }
 
@@ -104,15 +104,17 @@ EOF
         scp -o StrictHostKeyChecking=no "$temp_folder"/"$script_on_target_machine" "$user_on_target"@"$target_ip":~/
         ssh -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip" chmod +x "\$HOME/$script_on_target_machine"
         ssh -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip" "\$HOME/$script_on_target_machine"
-        scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/tmp/SUCCSS_inject_recovery_iso /tmp || usage
+        scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/tmp/SUCCSS_inject_recovery_iso $temp_folder || usage
     else
         img_jenkins_out_url="ftp://$jenkins_url/jenkins_host/jobs/$jenkins_job_for_iso/builds/$jenkins_job_build_no/archive/out"
         img_name="$(wget -q "$img_jenkins_out_url/" -O - | grep -o 'href=.*iso"' | awk -F/ '{print $NF}' | tr -d \")"
+        pushd "$temp_folder" || usage
         wget "$img_jenkins_out_url"/"$img_name.md5sum"
         md5sum -c $img_name.md5sum || wget "$img_jenkins_out_url"/"$img_name"
         md5sum -c $img_name.md5sum || usage
         local_iso="`pwd`/$img_name"
-        inject_recovery_iso && rm $local_iso
+        popd
+        inject_recovery_iso
     fi
 }
 prepare() {
@@ -134,6 +136,10 @@ do_recovery() {
     ssh -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip" sudo dell-restore-system -y &
     sleep 300 # sleep to make sure the target system has been rebooted to recovery mode.
     poll_recovery_status
+}
+
+clear_all() {
+    rm -rf "$temp_folder"
 }
 
 main() {
@@ -174,6 +180,7 @@ main() {
     done
     prepare
     #do_recovery
+    clear_all
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
