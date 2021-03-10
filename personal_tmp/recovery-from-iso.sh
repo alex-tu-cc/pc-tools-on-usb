@@ -1,16 +1,23 @@
 #!/bin/bash
 set -ex
 
+
+
 jenkins_job_for_iso="dell-bto-focal-fossa-edge-alloem"
 jenkins_job_build_no="lastSuccessfulBuild"
 jenkins_url="10.101.46.50"
+script_on_target_machine="inject_recovery_from_iso.sh"
 user_on_target="ubuntu"
 SSH="ssh -o StrictHostKeyChecking=no"
 SCP="scp -o StrictHostKeyChecking=no"
-temp_folder="$(mktemp -d -p "$PWD")"
 GIT="git -C $temp_folder"
 #TAR="tar -C $temp_folder"
-script_on_target_machine="inject_recovery_from_iso.sh"
+temp_folder="$(mktemp -d -p "$PWD")"
+
+clear_all() {
+    rm -rf "$temp_folder"
+}
+trap clear_all EXIT
 eval set -- $(getopt -o "hj:t:b:" -l "help,target-ip:,jenkins-job:,local-iso:" -- $@)
 
 usage() {
@@ -136,10 +143,6 @@ do_recovery() {
     ssh -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip" sudo dell-restore-system -y &
     sleep 300 # sleep to make sure the target system has been rebooted to recovery mode.
     poll_recovery_status
-}
-
-clear_all() {
-    rm -rf "$temp_folder"
 }
 
 main() {
