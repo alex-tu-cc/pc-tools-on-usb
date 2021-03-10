@@ -112,7 +112,7 @@ EOF
         md5sum -c $img_name.md5sum || wget "$img_jenkins_out_url"/"$img_name"
         md5sum -c $img_name.md5sum || usage
         local_iso="`pwd`/$img_name"
-        inject_recovery_iso
+        inject_recovery_iso && rm $local_iso
     fi
 }
 prepare() {
