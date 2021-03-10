@@ -78,7 +78,7 @@ push_preseed() {
     for folder in misc_for_automation oem-fix-misc-cnl-no-secureboot oem-fix-misc-cnl-skip-oobe oem-fix-misc-cnl-skip-storage-selecting; do
         tar -C "$temp_folder"/$folder -zcvf "$temp_folder"/$folder.tar.gz .
         $SCP $temp_folder/$folder.tar.gz "$user_on_target"@"$target_ip":~
-        $SSH "$user_on_target"@"$target_ip" tar -C push_preseed -zxvf $folder.tar.gz
+        $SSH "$user_on_target"@"$target_ip" tar -C push_preseed -zxvf $folder.tar.gz || $SSH "$user_on_target"@"$target_ip" sudo rm -f push_preseed/SUCCSS_push_preseed
     done
 
     $SSH "$user_on_target"@"$target_ip" sudo cp -r push_preseed/* /cdrom/
