@@ -179,7 +179,7 @@ main() {
            shift
     done
     prepare
-    #do_recovery
+    do_recovery
     clear_all
 }
 
