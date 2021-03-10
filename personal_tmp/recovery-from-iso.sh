@@ -10,9 +10,9 @@ script_on_target_machine="inject_recovery_from_iso.sh"
 user_on_target="ubuntu"
 SSH="ssh -o StrictHostKeyChecking=no"
 SCP="scp -o StrictHostKeyChecking=no"
-GIT="git -C $temp_folder"
 #TAR="tar -C $temp_folder"
 temp_folder="$(mktemp -d -p "$PWD")"
+GIT="git -C $temp_folder"
 
 clear_all() {
     rm -rf "$temp_folder"
