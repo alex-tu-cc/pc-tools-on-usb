@@ -1,8 +1,6 @@
 #!/bin/bash
 set -ex
 
-
-
 jenkins_job_for_iso="dell-bto-focal-fossa-edge-alloem"
 jenkins_job_build_no="lastSuccessfulBuild"
 jenkins_url="10.101.46.50"
@@ -58,13 +56,12 @@ download_preseed() {
     # get checkbox pkgs and prepare-checkbox
     # $GIT clone git+ssh://alextu@git.launchpad.net/~lyoncore-team/lyoncore/+git/somerville-maas-override --depth 1 -b checkbox-pkgs-focal checkbox-pkgs
     # get pkgs to skip OOBE
-    $GIT clone https://github.com/alex-tu-cc/pc-tools-on-usb.git --depth 1 -b oem-fix-misc-cnl-no-secureboot oem-fix-misc-cnl-no-secureboot
-    $GIT clone https://github.com/alex-tu-cc/pc-tools-on-usb.git --depth 1 -b oem-fix-misc-cnl-skip-oobe oem-fix-misc-cnl-skip-oobe
-    $GIT clone https://github.com/alex-tu-cc/pc-tools-on-usb.git --depth 1 -b oem-fix-misc-cnl-skip-storage-selecting oem-fix-misc-cnl-skip-storage-selecting
-
+    $GIT clone https://git.launchpad.net/~oem-solutions-engineers/pc-enablement/+git/oem-fix-misc-cnl-no-secureboot --depth 1
+    $GIT clone https://git.launchpad.net/~oem-solutions-engineers/pc-enablement/+git/oem-fix-misc-cnl-skip-oobe --depth 1
+    $GIT clone https://git.launchpad.net/~oem-solutions-engineers/pc-enablement/+git/oem-fix-misc-cnl-skip-storage-selecting --depth 1
 
     # get pkgs for ssh key and skip disk checking.
-    $GIT clone https://github.com/alex-tu-cc/pc-tools-on-usb.git --depth 1 misc_for_automation
+    $GIT clone https://git.launchpad.net/~oem-solutions-engineers/pc-enablement/+git/pc-oem-fix-misc-cnl-misc-for-automation --depth 1 misc_for_automation
 
     return 0
 }
