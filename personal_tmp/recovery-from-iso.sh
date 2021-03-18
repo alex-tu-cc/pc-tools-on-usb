@@ -61,7 +61,7 @@ download_preseed() {
     $GIT clone https://git.launchpad.net/~oem-solutions-engineers/pc-enablement/+git/oem-fix-misc-cnl-skip-storage-selecting --depth 1
 
     # get pkgs for ssh key and skip disk checking.
-    $GIT clone https://git.launchpad.net/~oem-solutions-engineers/pc-enablement/+git/pc-oem-fix-misc-cnl-misc-for-automation --depth 1 misc_for_automation
+    $GIT clone https://git.launchpad.net/~oem-solutions-engineers/pc-enablement/+git/oem-fix-misc-cnl-misc-for-automation --depth 1 misc_for_automation
 
     return 0
 }
