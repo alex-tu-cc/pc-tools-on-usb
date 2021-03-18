@@ -16,7 +16,8 @@ clear_all() {
     rm -rf "$temp_folder"
 }
 trap clear_all EXIT
-eval set -- $(getopt -o "hj:t:b:" -l "help,target-ip:,jenkins-job:,local-iso:" -- $@)
+# shellcheck disable=SC2046
+eval set -- $(getopt -o "hj:t:b:" -l "help,target-ip:,jenkins-job:,local-iso:" -- "$@")
 
 usage() {
 cat << EOF
@@ -38,7 +39,6 @@ OPTIONS:
     -t|--target-ip  The IP address of target machine. It will be used for ssh accessing.
                     Please put your ssh key on target machine. This tool no yet support keyphase for ssh.
     -h|--help Print this message
-    --dry-run Dryrun
 
     Usage:
     $(basename "$0") -j  dell-bto-focal-fossa-edge-alloem -b 3 -t 192.168.101.68
@@ -74,7 +74,7 @@ push_preseed() {
 
     for folder in misc_for_automation oem-fix-misc-cnl-no-secureboot oem-fix-misc-cnl-skip-oobe oem-fix-misc-cnl-skip-storage-selecting; do
         tar -C "$temp_folder"/$folder -zcvf "$temp_folder"/$folder.tar.gz .
-        $SCP $temp_folder/$folder.tar.gz "$user_on_target"@"$target_ip":~
+        $SCP "$temp_folder/$folder".tar.gz "$user_on_target"@"$target_ip":~
         $SSH "$user_on_target"@"$target_ip" tar -C push_preseed -zxvf $folder.tar.gz || $SSH "$user_on_target"@"$target_ip" sudo rm -f push_preseed/SUCCSS_push_preseed
     done
 
@@ -84,8 +84,8 @@ push_preseed() {
 inject_preseed() {
     echo " == inject_preseed == "
     download_preseed && \
-    push_preseed && \
-    scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/cdrom/SUCCSS_push_preseed $temp_folder || usage
+    push_preseed
+    scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/cdrom/SUCCSS_push_preseed "$temp_folder" || usage
     $SSH "$user_on_target"@"$target_ip" touch /tmp/SUCCSS_inject_preseed
 }
 
@@ -108,15 +108,15 @@ EOF
         scp -o StrictHostKeyChecking=no "$temp_folder"/"$script_on_target_machine" "$user_on_target"@"$target_ip":~/
         ssh -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip" chmod +x "\$HOME/$script_on_target_machine"
         ssh -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip" "\$HOME/$script_on_target_machine"
-        scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/tmp/SUCCSS_inject_recovery_iso $temp_folder || usage
+        scp -o StrictHostKeyChecking=no "$user_on_target"@"$target_ip":/tmp/SUCCSS_inject_recovery_iso "$temp_folder" || usage
     else
         img_jenkins_out_url="ftp://$jenkins_url/jenkins_host/jobs/$jenkins_job_for_iso/builds/$jenkins_job_build_no/archive/out"
         img_name="$(wget -q "$img_jenkins_out_url/" -O - | grep -o 'href=.*iso"' | awk -F/ '{print $NF}' | tr -d \")"
         pushd "$temp_folder" || usage
-        wget "$img_jenkins_out_url"/"$img_name.md5sum"
-        md5sum -c $img_name.md5sum || wget "$img_jenkins_out_url"/"$img_name"
-        md5sum -c $img_name.md5sum || usage
-        local_iso="`pwd`/$img_name"
+        wget "$img_jenkins_out_url/$img_name".md5sum
+        md5sum -c "$img_name".md5sum || wget "$img_jenkins_out_url"/"$img_name"
+        md5sum -c "$img_name".md5sum || usage
+        local_iso="$PWD/$img_name"
         popd
         inject_recovery_iso
     fi
@@ -165,9 +165,6 @@ main() {
             -h | --help)
                 usage 0
                 exit 0
-                ;;
-            --dry-run)
-                DRY_RUN=1;
                 ;;
             --)
            ;;
